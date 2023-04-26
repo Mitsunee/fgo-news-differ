@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-DATE="$(date +%F-%_H-%M-%S)"
+DATE="$(date +%F-%H-%M-%S)"
 DATA_DIR="$(realpath ./data)"
 export TARGET_DIR="$DATA_DIR/$DATE"
 export PAGE_LINK="https://webview.fate-go.us/"
