@@ -9,7 +9,10 @@
   "scripts": {
     "format": "prettier -w .",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "download": "bash download.sh",
+    "compare": "tsx compare",
+    "compare:latest": "tsx compare --latest"
   },
   "dependencies": {
     "@types/diff": "^5.0.3",
