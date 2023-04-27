@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "download": "bash download.sh",
     "compare": "tsx compare",
-    "compare:latest": "tsx compare --latest"
+    "compare:latest": "tsx compare --latest",
+    "clean": "tsx clean",
+    "clean:force": "tsx clean --assume-yes"
   },
   "dependencies": {
     "@types/diff": "^5.0.3",
