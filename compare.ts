@@ -12,7 +12,10 @@ async function getSortedFileList(dirPath: string) {
 }
 
 async function main() {
-  const snapshots = await pickSnapshots();
+  let latestArg = false;
+  if (process.argv[2] == "--latest") latestArg = true;
+
+  const snapshots = await pickSnapshots(latestArg);
   const [filesOld, filesNew] = await Promise.all(
     snapshots.map(snapshot => getSortedFileList(snapshot.path))
   );

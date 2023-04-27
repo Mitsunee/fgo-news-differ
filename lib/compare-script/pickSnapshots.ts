@@ -4,12 +4,19 @@ import type { Snapshot } from "../getSnapshots";
 import inquirer from "inquirer";
 const prompt = inquirer.createPromptModule()<{ choice: string }>;
 
-export async function pickSnapshots(): Promise<[Snapshot, Snapshot]> {
+export async function pickSnapshots(
+  latest: boolean
+): Promise<[Snapshot, Snapshot]> {
   const snapshots = await getSnapshots();
 
   if (snapshots.length < 2) {
     console.error("There aren't enough snapshots for a comparison");
     process.exit(1);
+  }
+
+  if (latest) {
+    const [snapB, snapA] = snapshots;
+    return [snapA, snapB];
   }
 
   let res: { choice: string } = await prompt({
