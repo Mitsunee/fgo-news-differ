@@ -1,34 +1,42 @@
 export function compareFileLists(filesOld: string[], filesNew: string[]) {
+  const res = {
+    files: new Array<string>(),
+    added: new Array<string>(),
+    removed: new Array<string>()
+  };
+
   let iOld = 0;
   let iNew = 0;
   while (filesOld[iOld] && filesNew[iNew]) {
     if (filesOld[iOld] == filesNew[iNew]) {
-      console.log(`~ ${filesOld[iOld]}`);
+      res.files.push(filesOld[iOld]);
       iOld++;
       iNew++;
       continue;
     }
 
     if (filesNew.slice(iNew).findIndex(file => file == filesOld[iOld]) >= 0) {
-      console.log(`+ ${filesNew[iNew]} (file added)`);
+      res.added.push(filesNew[iNew]);
       iNew++;
       continue;
     }
 
-    console.log(`- ${filesOld[iOld]} (file removed)`);
+    res.removed.push(filesOld[iOld]);
     iOld++;
     continue;
   }
 
   if (iOld < filesOld.length) {
     filesOld.slice(iOld).forEach(file => {
-      console.log(`- ${file} (file removed)`);
+      res.removed.push(file);
     });
   }
 
   if (iNew < filesNew.length) {
     filesNew.slice(iNew).forEach(file => {
-      console.log(`+ ${file} (file added)`);
+      res.added.push(file);
     });
   }
+
+  return res;
 }
