@@ -15,10 +15,12 @@ process_url () {
 
 export -f process_url
 
-mkdir -p "$TARGET_DIR";
+mkdir -p "$TARGET_DIR"
 touch $PRETTIER_IGNORE
 curl -o "$TARGET_DIR/index.html" "$PAGE_LINK"
+curl -o "$TARGET_DIR/maintenance.html" "${PAGE_LINK}maintenance/"
+curl -o "$TARGET_DIR/updates.html" "${PAGE_LINK}update/"
 
-pnpm tsx get-urls.ts "$TARGET_DIR/index.html" | xargs -I {} bash -c "process_url {}" _
+pnpm tsx get-urls.ts "$TARGET_DIR" | xargs -I {} bash -c "process_url {}" _
 pnpm prettier --ignore-path $PRETTIER_IGNORE -w "$DATA_DIR"
 echo $DATE >> $PRETTIER_IGNORE

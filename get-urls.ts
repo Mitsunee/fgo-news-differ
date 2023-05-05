@@ -10,17 +10,17 @@ const ArgsSchema = z.tuple([
     if (!filePath.startsWith(dataDir)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "File must be in './data'",
+        message: "Path must be in './data'",
         fatal: true
       });
 
       return z.NEVER;
     }
 
-    if (!/\d{4}(-\d{2}){5}\/index\.html$/.test(filePath)) {
+    if (!/\d{4}(-\d{2}){5}\/?$/.test(filePath)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "File must be index.html in data dir",
+        message: "Path must be directory using '%F-%H-%M-%S' name pattern",
         fatal: true
       });
 
@@ -31,16 +31,41 @@ const ArgsSchema = z.tuple([
   })
 ]);
 
-async function main(args: z.output<typeof ArgsSchema>) {
-  const fileContent = await readFile(args[0], "utf-8");
-  const $ = cheerio.load(fileContent);
-  const links = $("ul.list > li a.clearfix");
-  links.each((_, link) => {
-    if (typeof link.attribs.href == "string") {
-      const url = new URL(link.attribs.href, "https://webview.fate-go.us/");
-      console.log(url.toString());
+type LinkCollection = cheerio.Cheerio<cheerio.Element>;
+// prettier-ignore
+async function getLinksByPath(filePath: string, failHard: true): Promise<LinkCollection>;
+// prettier-ignore
+async function getLinksByPath(filePath: string, failHard?: undefined): Promise<LinkCollection | undefined>;
+async function getLinksByPath(filePath: string, failHard?: true) {
+  try {
+    const fileContent = await readFile(filePath, "utf-8");
+    const $ = cheerio.load(fileContent);
+    return $("ul.list > li a.clearfix");
+  } catch (e) {
+    if (failHard) {
+      console.error(`Error while trying to get links from '${filePath}'`);
+      throw e;
     }
-  });
+    return;
+  }
+}
+
+function printLinkAsURL(_: number, link: cheerio.Element) {
+  if (typeof link.attribs.href == "string") {
+    const url = new URL(link.attribs.href, "https://webview.fate-go.us");
+    console.log(url.toString());
+  }
+}
+
+async function main(args: z.output<typeof ArgsSchema>) {
+  const [newsLinks, maintenanceLinks, updateLinks] = await Promise.all([
+    getLinksByPath(path.join(args[0], "index.html"), true),
+    getLinksByPath(path.join(args[0], "maintenance.html")),
+    getLinksByPath(path.join(args[0], "updates.html"))
+  ]);
+  newsLinks.each(printLinkAsURL);
+  maintenanceLinks?.each(printLinkAsURL);
+  updateLinks?.each(printLinkAsURL);
 }
 
 try {
